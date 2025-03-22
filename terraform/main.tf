@@ -31,11 +31,20 @@ resource "aws_security_group" "flask_sg" {
   }
 }
 
+# Import SSH public key into AWS
+resource "aws_key_pair" "hello_k3s_ansible_key" {
+  key_name   = "hello-k3s-ansible-key"
+  public_key = file("~/.ssh/hello-k3s-ansible-key.pub")
+}
+
+
 # EC2 instance creation
 resource "aws_instance" "flask_instance" {
   ami                    = "ami-0f9de6e2d2f067fca" # Amazon Ubuntu 22.04 AMI (us-east-1)
   instance_type          = var.instance_type
   vpc_security_group_ids     = [aws_security_group.flask_sg.id]
+  key_name               = aws_key_pair.hello_k3s_ansible_key.key_name  
+
 
   tags = {
     Name = "flask-ec2-instance"

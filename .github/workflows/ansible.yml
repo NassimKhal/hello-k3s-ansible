@@ -1,4 +1,4 @@
-name: Ansible Provisioning
+name: Ansible Provisioning and Kubernetes Deployment
 
 on:
   push:
@@ -8,17 +8,53 @@ on:
       - 'ansible/**'
       - 'kubernetes/**'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  ansible-run:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::539247494423:role/GitHubActionsOIDCRole
+          aws-region: us-east-1
+
+      - name: Get Terraform Outputs from Terraform Cloud
+        uses: hashicorp/tfc-workflows-github/actions/output@v1
+        with:
+          organization: hello-k3s
+          workspace: hello-k3s-ansible
+          token: ${{ secrets.TF_API_TOKEN }}
+        id: tf_output
+
+      - name: Create dynamic inventory
+        run: |
+          echo "[flask_server]" > ansible/inventory.ini
+          echo "${{ steps.tf_output.outputs.ec2_ip }}" >> ansible/inventory.ini
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Wait for EC2 SSH to be available
+        run: |
+          echo "Waiting for SSH to be ready..."
+          for i in {1..20}; do
+            if ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{ steps.tf_output.outputs.ec2_ip }} 'echo ok' 2>/dev/null; then
+              echo "SSH is ready!"
+              break
+            fi
+            echo "Attempt $i: SSH not ready yet..."
+            sleep 10
+          done
 
       - name: Run Ansible Playbook
         working-directory: ansible

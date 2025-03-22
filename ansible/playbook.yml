@@ -86,3 +86,16 @@
     - name: Output k3s nodes status
       debug:
         var: k3s_nodes.stdout
+    - name: Copy Kubernetes manifests clearly to the remote server
+      copy:
+        src: "../kubernetes/"
+        dest: "/home/ubuntu/kubernetes"
+        mode: '0644'
+
+    - name: Deploy Flask application to k3s Kubernetes cluster (deployment & service)
+      shell: |
+        sudo k3s kubectl apply -f /home/ubuntu/kubernetes/flask-deployment.yaml
+        sudo k3s kubectl apply -f /home/ubuntu/kubernetes/flask-service.yaml
+      args:
+        executable: /bin/bash
+      

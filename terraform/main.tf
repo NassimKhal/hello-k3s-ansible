@@ -18,7 +18,7 @@ resource "aws_security_group" "flask_sg" {
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }
-  
+
   ingress {
     description      = "Kubernetes NodePort"
     from_port        = 30001
@@ -42,7 +42,7 @@ resource "aws_security_group" "flask_sg" {
 # Import SSH public key into AWS
 resource "aws_key_pair" "hello_k3s_ansible_key" {
   key_name   = "hello-k3s-ansible-key"
-  public_key = file("~/.ssh/hello-k3s-ansible-key.pub")
+  public_key = var.ssh_public_key
 }
 
 

@@ -73,7 +73,7 @@
       register: k3s_status
       changed_when: false
 
-    - name: Ensure k3s is running (verify clearly)
+    - name: Ensure k3s is running test (verify clearly)
       assert:
         that:
           - "'active' in k3s_status.stdout"

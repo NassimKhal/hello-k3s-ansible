@@ -20,8 +20,9 @@ WORKDIR /app
 # Copy only runtime dependencies
 COPY --from=builder /install /usr/local
 
-# Copy Flask application
+# Copy Flask application and templates
 COPY flask-app/app.py .
+COPY flask-app/templates ./templates
 
 # Minimal user privileges
 RUN adduser -D flaskuser

@@ -50,3 +50,12 @@ resource "aws_instance" "flask_instance" {
     Name = "flask-ec2-instance"
   }
 }
+
+# Automated inventory.ini generation
+resource "local_file" "ansible_inventory" {
+  filename = "../ansible/inventory.ini"
+  content  = <<-EOF
+  [flask_server]
+  ${aws_instance.flask_instance.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/hello-k3s-ansible-key
+  EOF
+}

@@ -18,6 +18,14 @@ resource "aws_security_group" "flask_sg" {
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }
+  
+  ingress {
+    description      = "Kubernetes NodePort"
+    from_port        = 30001
+    to_port          = 30001
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
 
   egress {
     from_port        = 0

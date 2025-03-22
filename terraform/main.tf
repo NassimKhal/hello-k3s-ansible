@@ -1,4 +1,3 @@
-# main.tf
 # Triggering plan
 
 # Create security group for your EC2 instance

@@ -1,41 +1,115 @@
-# Hello-k3s-ansible 🚀
+# 🚀 Hello-k3s-ansible
 
-> **Automated deployment of a Flask application on AWS using Terraform, Ansible, Docker, and Kubernetes (k3s).**
+> **Automated Deployment of a Lightweight Flask Application on Kubernetes (k3s) using AWS, Terraform, Docker, and Ansible**
 
-## 🔍 Project Overview
+---
 
-This project demonstrates essential DevOps skills through the automated deployment of a lightweight Flask "Hello World" application onto a minimal Kubernetes (k3s) cluster hosted on AWS EC2 (Free Tier).
+## 📖 Project Overview
 
-## 📦 Technologies Used
+This project showcases an automated and highly optimized DevOps workflow, deploying a simple yet effective Flask "Hello World" application onto a minimalistic Kubernetes (k3s) cluster running on AWS infrastructure. Leveraging Infrastructure as Code (IaC) best practices, this solution emphasizes efficiency, security, and automation to achieve seamless, cost-free deployment.
 
-- **Cloud Provider**: AWS (Free Tier)
-- **Infrastructure as Code (IaC)**: Terraform
-- **Configuration Management**: Ansible
-- **Containerization**: Docker
-- **Orchestration**: Kubernetes (k3s)
-- **CI/CD**: GitHub Actions (Unit & Security Tests)
+---
 
-## 🎯 Objectives
+## 🌐 Technologies Used
 
-- Demonstrate essential DevOps methodologies and tools.
-- Maintain resource efficiency and stay within the AWS Free Tier.
-- Apply professional-level coding, commenting, and documentation practices.
-- Ensure readability and maintainability of the codebase.
+- **Cloud Provider:** AWS (Free Tier)
+- **Infrastructure as Code (IaC):** Terraform
+- **Configuration Management & Automation:** Ansible
+- **Containerization:** Docker
+- **Container Orchestration:** Kubernetes (k3s)
+- **CI/CD & Testing:** GitHub Actions (Unit & Security Tests)
 
-## 🛠️ Project Structure
+---
 
+## 🎯 Project Objectives
 
-## 🚧 Project Status
+- Demonstrate proficiency in essential DevOps methodologies and tools.
+- Maintain optimized resource usage (AWS Free Tier).
+- Implement professional-level automation and configuration management.
+- Showcase clearly structured and meticulously documented code, suitable for enterprise-level peer reviews.
 
-> **In Progress**: Sprint 1 - Initialization Phase.
+---
 
-## 📌 Next Steps (Sprint 2)
+## 📂 Project Structure
 
-- Build infrastructure on AWS using Terraform.
-- Automate deployment and provisioning with Ansible.
+```
+Hello-k3s-ansible/
+├── ansible/        # Ansible playbooks and inventory files
+├── terraform/      # Terraform configuration files for AWS infrastructure
+├── flask-app/      # Python Flask application source code
+├── docker/         # Dockerfiles and Docker Compose files
+└── kubernetes/     # Kubernetes YAML manifests for k3s deployment
+```
 
-## 🔑 Author
+---
 
-[Nassim Khalfa] - DevOps Engineer  
-[https://www.linkedin.com/in/nassim-khalfa]
+## ✅ Project Achievements
+
+### 🏗️ Infrastructure Setup with Terraform
+
+- Provisioned AWS EC2 instance (`t2.micro`, Ubuntu 22.04) in region `us-east-1`.
+- Configured secure access through SSH and HTTP using Security Groups.
+- Automated SSH key pair creation and attachment via Terraform.
+
+### ⚙️ Automated Server Provisioning with Ansible
+
+- Developed an Ansible inventory for managing remote servers.
+- Created robust Ansible playbooks to automate:
+  - Installation of Docker Engine (v28.0.2) and Docker Compose.
+  - Deployment of lightweight Kubernetes distribution (k3s v1.31.6).
+- Ensured all Ansible tasks are clearly documented, repeatable, and idempotent.
+
+### 🐳 Containerization & Orchestration (Upcoming Sprint)
+
+- Containerize Flask application using Docker (optimized Dockerfile).
+- Deploy containerized Flask application onto Kubernetes (k3s).
+
+---
+
+## 📌 Completed Sprints
+
+| Sprint # | Description                                    | Status          |
+|----------|------------------------------------------------|-----------------|
+| 1        | Project Initialization and AWS Setup           | ✅ Completed    |
+| 2        | Infrastructure as Code with Terraform          | ✅ Completed    |
+| 3        | Automation and Provisioning with Ansible       | ✅ Completed    |
+
+---
+
+## 🚧 To-Do List (Next Sprints)
+
+- [ ] **Sprint 4:** Containerize Flask application with Docker.
+- [ ] **Sprint 5:** Deploy Flask application to Kubernetes (k3s).
+- [ ] **Sprint 6:** Implement CI/CD pipelines with GitHub Actions, integrating unit and security tests.
+- [ ] **Optimization & Security Review:** Resource optimization, security best practices review, and advanced monitoring.
+
+---
+
+## 🛡️ Security & Optimization
+
+- Continuous monitoring and cost management practices to ensure zero-cost AWS usage.
+- Secure handling of AWS credentials (using AWS CLI, no hard-coded keys).
+- Clearly documented SSH key management and automated provisioning for enhanced security.
+
+---
+
+## 📈 CI/CD Pipeline (Coming Soon)
+
+Automated GitHub Actions pipelines will include:
+
+- Automated Docker image builds and security scans.
+- Automated deployments to Kubernetes (k3s).
+- Integrated testing (unit and security tests) for continuous validation.
+
+---
+
+## 🧑‍💻 Author
+
+**Nassim Khalfa**  
+DevOps Engineer  
+🔗 [Nassim Khalfa](https://www.linkedin.com/in/nassim-khalfa)  
+
+---
+
+⭐ **If you find this project interesting or valuable, please consider giving it a star!**
 

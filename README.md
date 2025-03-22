@@ -67,6 +67,12 @@ Hello-k3s-ansible/
 - Docker image available publicly on Docker Hub:
   - [fragmendal/flask-k3s-app](https://hub.docker.com/r/fragmendal/flask-k3s-app)
 
+### 🚀 Kubernetes Deployment & Automation
+
+- Created Kubernetes Deployment and Service YAML manifests.
+- Automated deployment of Flask application onto Kubernetes (k3s) using Ansible.
+- Verified the Flask application is accessible via Kubernetes NodePort externally.
+
 ---
 
 ## 📌 Completed Sprints
@@ -77,12 +83,12 @@ Hello-k3s-ansible/
 | 2        | Infrastructure as Code with Terraform          | ✅ Completed    |
 | 3        | Automation and Provisioning with Ansible       | ✅ Completed    |
 | 4        | Flask Application Containerization with Docker | ✅ Completed    |
+| 5        | Kubernetes (k3s) Deployment & Automation       | ✅ Completed    |
 
 ---
 
 ## 🚧 To-Do List (Next Sprints)
 
-- [ ] **Sprint 5:** Deploy Flask application to Kubernetes (k3s).
 - [ ] **Sprint 6:** Implement CI/CD pipelines with GitHub Actions, integrating unit and security tests.
 - [ ] **Optimization & Security Review:** Resource optimization, security best practices review, and advanced monitoring.
 
@@ -114,10 +120,9 @@ Minimalist Flask application with modern and clean UI powered by Bootstrap 5.
 
 ## 🧑‍💻 Author
 
-**Your Name**  
-DevOps Engineer  
-📧 [your.email@example.com](mailto:your.email@example.com)  
-🔗 [Your LinkedIn Profile](https://www.linkedin.com/in/yourprofile)  
+**Nassim Khalfa**  
+DevOps Engineer   
+🔗 [Nassim Khalfa](https://www.linkedin.com/in/nassim-khalfa)  
 
 ---
 

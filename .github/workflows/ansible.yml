@@ -1,0 +1,26 @@
+name: Ansible Provisioning
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ansible/**'
+      - 'kubernetes/**'
+
+jobs:
+  ansible-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Run Ansible Playbook
+        working-directory: ansible
+        run: |
+          ansible-playbook -i inventory.ini playbook.yml

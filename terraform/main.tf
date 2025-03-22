@@ -1,3 +1,6 @@
+# main.tf
+# Triggering plan
+
 # Create security group for your EC2 instance
 resource "aws_security_group" "flask_sg" {
   name        = "flask-sg"
@@ -39,7 +42,7 @@ resource "aws_security_group" "flask_sg" {
   }
 }
 
-# Import SSH public key into AWS test
+# Import SSH public key into AWS
 resource "aws_key_pair" "hello_k3s_ansible_key" {
   key_name   = "hello-k3s-ansible-key"
   public_key = var.ssh_public_key

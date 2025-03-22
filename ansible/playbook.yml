@@ -1,7 +1,7 @@
 ---
 - hosts: flask_server
   become: yes  # Run tasks with sudo privileges
-
+# trigger
   tasks:
     - name: Update package cache (apt-get update)
       apt:

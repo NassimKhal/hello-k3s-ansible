@@ -59,10 +59,13 @@ Hello-k3s-ansible/
   - Deployment of lightweight Kubernetes distribution (k3s v1.31.6).
 - Ensured all Ansible tasks are clearly documented, repeatable, and idempotent.
 
-### 🐳 Containerization & Orchestration (Upcoming Sprint)
+### 🐳 Containerization & Dockerization
 
-- Containerize Flask application using Docker (optimized Dockerfile).
-- Deploy containerized Flask application onto Kubernetes (k3s).
+- Containerized Flask application using an optimized Dockerfile (multi-stage build, Alpine-based).
+- Built and tested ultra-lightweight Docker images.
+- Deployed a modern, clean UI using Flask and Bootstrap for enhanced frontend experience.
+- Docker image available publicly on Docker Hub:
+  - [fragmendal/flask-k3s-app](https://hub.docker.com/r/fragmendal/flask-k3s-app)
 
 ---
 
@@ -73,12 +76,12 @@ Hello-k3s-ansible/
 | 1        | Project Initialization and AWS Setup           | ✅ Completed    |
 | 2        | Infrastructure as Code with Terraform          | ✅ Completed    |
 | 3        | Automation and Provisioning with Ansible       | ✅ Completed    |
+| 4        | Flask Application Containerization with Docker | ✅ Completed    |
 
 ---
 
 ## 🚧 To-Do List (Next Sprints)
 
-- [ ] **Sprint 4:** Containerize Flask application with Docker.
 - [ ] **Sprint 5:** Deploy Flask application to Kubernetes (k3s).
 - [ ] **Sprint 6:** Implement CI/CD pipelines with GitHub Actions, integrating unit and security tests.
 - [ ] **Optimization & Security Review:** Resource optimization, security best practices review, and advanced monitoring.
@@ -103,13 +106,19 @@ Automated GitHub Actions pipelines will include:
 
 ---
 
+## 🎨 Application UI (Flask)
+
+Minimalist Flask application with modern and clean UI powered by Bootstrap 5.
+
+---
+
 ## 🧑‍💻 Author
 
-**Nassim Khalfa**  
+**Your Name**  
 DevOps Engineer  
-🔗 [Nassim Khalfa](https://www.linkedin.com/in/nassim-khalfa)  
+📧 [your.email@example.com](mailto:your.email@example.com)  
+🔗 [Your LinkedIn Profile](https://www.linkedin.com/in/yourprofile)  
 
 ---
 
 ⭐ **If you find this project interesting or valuable, please consider giving it a star!**
-

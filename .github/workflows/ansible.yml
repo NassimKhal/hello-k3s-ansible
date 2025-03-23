@@ -26,7 +26,6 @@ jobs:
           role-to-assume: arn:aws:iam::539247494423:role/GitHubActionsOIDCRole
           aws-region: us-east-1
 
-      steps:
       - name: Fetch remote value from Terraform
         uses: paambaati/tfc-output-action@v1.0.8
         id: tfc-output

@@ -56,7 +56,7 @@ jobs:
         id: tags
         run: |
           if [ "${{ steps.check_provisioned.outputs.provisioned }}" = "false" ]; then
-            echo "tags=install,deploy" >> $GITHUB_OUTPUT
+            echo "tags=install,k3s,deploy" >> $GITHUB_OUTPUT
           else
             git fetch origin main
             CHANGED=$(git diff --name-only origin/main...HEAD)

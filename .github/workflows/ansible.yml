@@ -38,7 +38,8 @@ jobs:
         run: |
           mkdir -p ansible
           echo "[flask_server]" > ansible/inventory.ini
-          echo "${{ steps.tfc-output.outputs.value }}" >> ansible/inventory.ini
+          echo "${{ steps.tfc-output.outputs.value }} ansible_user=ubuntu" >> ansible/inventory.ini
+
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -50,7 +51,7 @@ jobs:
           ip="${{ steps.tfc-output.outputs.value }}"
           echo "Waiting for SSH on $ip..."
           for i in {1..20}; do
-            if ssh -o StrictHostKeyChecking=no ec2-user@$ip 'echo SSH is up'; then
+            if ssh -o StrictHostKeyChecking=no ubuntu@$ip 'echo SSH is up'; then
               echo "SSH is ready!"
               break
             fi

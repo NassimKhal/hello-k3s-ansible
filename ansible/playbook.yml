@@ -5,22 +5,31 @@
 
   tasks:
 
-    - name: Install Docker
-      tags: install
-      apt:
-        name: docker.io
-        state: present
-        update_cache: yes
+    - name: Check if instance is already provisioned
+      tags: always
+      stat:
+        path: /etc/provisioned_by_ansible
+      register: provisioned_status
 
-    - name: Enable Docker service
+    - name: Install Docker and enable service
       tags: install
-      systemd:
-        name: docker
-        enabled: yes
-        state: started
+      when: not provisioned_status.stat.exists
+      block:
+        - name: Install Docker
+          apt:
+            name: docker.io
+            state: present
+            update_cache: yes
+
+        - name: Enable Docker service
+          systemd:
+            name: docker
+            enabled: yes
+            state: started
 
     - name: Install k3s
       tags: k3s
+      when: not provisioned_status.stat.exists
       shell: |
         curl -sfL https://get.k3s.io | sh -
       args:
@@ -28,10 +37,18 @@
 
     - name: Wait for k3s to be ready
       tags: k3s
+      when: not provisioned_status.stat.exists
       shell: |
         until k3s kubectl get nodes; do sleep 5; done
 
-    - name: Copy Kubernetes manifests clearly to the remote server
+    - name: Mark instance as provisioned
+      tags: install
+      when: not provisioned_status.stat.exists
+      file:
+        path: /etc/provisioned_by_ansible
+        state: touch
+
+    - name: Copy Kubernetes manifests to the remote server
       tags: deploy
       copy:
         src: "../kubernetes/"
@@ -40,11 +57,11 @@
 
     - name: Apply Kubernetes Deployment
       tags: deploy
-      shell: k3s kubectl apply -f /tmp/flask-deployment.yml
+      shell: k3s kubectl apply -f /tmp/flask-deployment.yaml
 
     - name: Apply Kubernetes Service
       tags: deploy
-      shell: k3s kubectl apply -f /tmp/flask-service.yml
+      shell: k3s kubectl apply -f /tmp/flask-service.yaml
 
     - name: Clean up manifest files
       tags: deploy
@@ -54,5 +71,3 @@
       loop:
         - flask-deployment.yaml
         - flask-service.yaml
-
-      

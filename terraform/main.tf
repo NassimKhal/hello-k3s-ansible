@@ -1,4 +1,4 @@
-# Triggers
+# Trigger
 # Create security group for your EC2 instance
 resource "aws_security_group" "flask_sg" {
   name        = "flask-sg"

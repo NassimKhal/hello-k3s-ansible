@@ -16,6 +16,7 @@ This project follows **industry-standard best practices**, including secure CI/C
 | Orchestration    | K3s (lightweight Kubernetes)     |
 | CI/CD            | GitHub Actions + Terraform Cloud |
 | Cloud Provider   | AWS Free Tier (EC2)              |
+| Testing & Security | Pytest, Checkov, Ansible-Lint |
 
 ---
 
@@ -73,6 +74,14 @@ This project follows **industry-standard best practices**, including secure CI/C
 - ✅ Kubernetes manifests (`flask-deployment.yaml`, `flask-service.yaml`) are cleaned up after deployment
 - ✅ Ansible workflow automatically skips if no EC2 is present or no relevant files have changed
 
+### ✅ Sprint 9: Testing and Infrastructure Security
+- ✅ Added unit testing to Flask app using `pytest`
+- ✅ Created `test_app.py` to validate homepage rendering
+- ✅ Integrated tests into CI workflow via GitHub Actions (`test.yml`)
+- ✅ Added Checkov to scan Terraform configuration (`iac-checks.yml`)
+- ✅ Added `ansible-lint` to validate Ansible playbooks (`ansible-lint.yml`)
+- ✅ All test and security tools are integrated into CI/CD
+
 ---
 
 ## 🧪 How It Works
@@ -85,6 +94,9 @@ This project follows **industry-standard best practices**, including secure CI/C
 4. Ansible connects via SSH to provision Docker, K3s, and deploy the Flask app
 5. A marker file (`/etc/provisioned_by_ansible`) ensures the playbook only runs once per instance
 6. The app is available at `http://<ec2_ip>:30001`
+7. Flask app unit tests are run on each push
+8. Terraform code is scanned by Checkov for security best practices
+9. Ansible playbooks are validated by Ansible-Lint for syntax and quality
 
 ---
 
@@ -100,11 +112,23 @@ This project follows **industry-standard best practices**, including secure CI/C
 - Fetches EC2 IP dynamically from Terraform Cloud
 - SSHs into EC2 using CI key
 - Checks for `/etc/provisioned_by_ansible` marker
-- Runs Ansible playbook with smart tag selection:
-  - `install`: Docker, system setup
-  - `k3s`: lightweight Kubernetes engine
-  - `deploy`: Kubernetes manifests for the Flask app
-- Skips Ansible run if nothing changed
+- Runs Ansible playbook with smart tag selection
+
+### 🧪 Flask App Unit Tests
+**File:** `.github/workflows/test.yml`
+- Triggers on changes to `flask-app/**`
+- Runs tests using `pytest` with `test_app.py`
+
+### 🔍 Terraform Security Scan
+**File:** `.github/workflows/iac-checks.yml`
+- Triggers on changes to `terraform/**`
+- Uses Checkov to detect misconfigurations or security risks
+
+### 🔎 Ansible Lint
+**File:** `.github/workflows/ansible-lint.yml`
+- Triggers on changes to `ansible/**`
+- Runs `ansible-lint` on `ansible/playbook.yml`
+- Fails on bad practices, formatting, or syntax errors
 
 ---
 
@@ -113,6 +137,8 @@ This project follows **industry-standard best practices**, including secure CI/C
 - 🔐 SSH private keys stored in **GitHub Secrets**
 - ☁️ AWS access via **OIDC GitHub Identity Federation**
 - 🧱 Terraform IAM user has a **minimal IAM policy** (except for temporary use of EC2FullAccess)
+- 🛡️ Terraform code is continuously scanned for security issues with Checkov
+- 🧹 Ansible playbooks are continuously linted for quality
 
 ---
 
@@ -127,7 +153,6 @@ This project follows **industry-standard best practices**, including secure CI/C
 
 | Sprint     | Task                                                                                      | Priority |
 |------------|---------------------------------------------------------------------------------------------|----------|
-| Sprint 9   | Add unit tests (`pytest`) and IaC security scanning (`Checkov`)                            | ✅ Medium |
 | Sprint 10  | Add monitoring using Prometheus + Grafana on EC2 and container                             | ✅ Medium |
 | Sprint 11  | Store secrets and SSH keys more securely (explore `git-crypt`, `sops`, or HashiCorp Vault) | ✅ Medium |
 

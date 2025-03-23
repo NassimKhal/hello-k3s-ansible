@@ -2,63 +2,71 @@ name: Ansible Provisioning
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'ansible/**'
       - 'kubernetes/**'
 
 jobs:
-  ansible-run:
-    name: Run Ansible Playbook
+  provision:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch EC2 Public IP from Terraform Cloud
-        id: tfc-output
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_CI_KEY }}
+
+      - name: Fetch EC2 IP from Terraform Cloud Output
         uses: paambaati/tfc-output-action@v1.0.8
+        id: tfc-output
         with:
           apiToken: ${{ secrets.TF_API_TOKEN }}
           workspaceId: ws-kcEEUwPhAyDuzShM
           variableName: 'ec2_public_ip'
 
-      - name: Check if EC2 IP is available
-        id: check-ip
+      - name: Exit if EC2 IP is not available
+        if: ${{ steps.tfc-output.outputs.value == '' }}
         run: |
-          ip="${{ steps.tfc-output.outputs.value }}"
-          echo "EC2 IP: $ip"
-          if [ -z "$ip" ]; then
-            echo "No EC2 instance detected. Exiting."
-            exit 0
-          fi
-          echo "ip=$ip" >> $GITHUB_ENV
+          echo "No EC2 instance available. Exiting..."
+          exit 0
 
       - name: Create dynamic Ansible inventory
         run: |
           mkdir -p ansible
           echo "[flask_server]" > ansible/inventory.ini
-          echo "$ip ansible_user=ubuntu" >> ansible/inventory.ini
+          echo "${{ steps.tfc-output.outputs.value }} ansible_user=ubuntu" >> ansible/inventory.ini
 
-      - name: Set up SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY_CI }}
-
-      - name: Wait for SSH to be Ready
+      - name: Detect changed files and set Ansible tags
+        id: changes
         run: |
-          echo "Waiting for SSH on $ip..."
-          for i in {1..20}; do
-            if ssh -o StrictHostKeyChecking=no ubuntu@$ip 'echo SSH is up'; then
-              echo "SSH is ready!"
-              break
-            fi
-            sleep 10
-          done
+          git fetch origin main
+          CHANGED=$(git diff --name-only origin/main...HEAD)
 
-      - name: Run Ansible Playbook
+          TAGS=""
+          if echo "$CHANGED" | grep -q "^ansible/"; then
+            TAGS="install"
+          fi
+          if echo "$CHANGED" | grep -q "^kubernetes/"; then
+            if [[ "$TAGS" == "install" ]]; then
+              TAGS="install,deploy"
+            else
+              TAGS="deploy"
+            fi
+          fi
+
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "Detected tags: $TAGS"
+
+      - name: Run Ansible Playbook with detected tags
+        if: ${{ steps.changes.outputs.tags != '' }}
         working-directory: ansible
         run: |
-          ansible-playbook -i inventory.ini playbook.yml
+          ansible-playbook -i inventory.ini playbook.yml --tags "${{ steps.changes.outputs.tags }}"
+
+      - name: Skip playbook (no relevant changes)
+        if: ${{ steps.changes.outputs.tags == '' }}
+        run: echo "No Ansible-related changes detected. Skipping playbook run."

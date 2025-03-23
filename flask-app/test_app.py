@@ -10,4 +10,4 @@ def client():
 def test_homepage(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Hello from Flask running on K3s!" in response.data
+    assert b"Hello, k3s & Ansible!" in response.data

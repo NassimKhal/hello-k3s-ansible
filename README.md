@@ -1,129 +1,126 @@
-# 🚀 Hello-k3s-ansible
+# Hello-k3s-ansible
 
-> **Automated Deployment of a Lightweight Flask Application on Kubernetes (k3s) using AWS, Terraform, Docker, and Ansible**
+A minimal, production-style DevOps project to deploy a lightweight Flask web application using **Terraform Cloud**, **GitHub Actions**, **Ansible**, **Docker**, and **K3s on AWS EC2** — all within the **AWS Free Tier**.
 
----
-
-## 📖 Project Overview
-
-This project showcases an automated and highly optimized DevOps workflow, deploying a simple yet effective Flask "Hello World" application onto a minimalistic Kubernetes (k3s) cluster running on AWS infrastructure. Leveraging Infrastructure as Code (IaC) best practices, this solution emphasizes efficiency, security, and automation to achieve seamless, cost-free deployment.
+This project follows **industry-standard best practices**, including secure CI/CD pipelines, infrastructure-as-code, Kubernetes deployment, and automated provisioning. It was created to demonstrate real-world DevOps skills in a simple, understandable, and recruiter-friendly way.
 
 ---
 
-## 🌐 Technologies Used
+## 🚀 Tech Stack
 
-- **Cloud Provider:** AWS (Free Tier)
-- **Infrastructure as Code (IaC):** Terraform
-- **Configuration Management & Automation:** Ansible
-- **Containerization:** Docker
-- **Container Orchestration:** Kubernetes (k3s)
-- **CI/CD & Testing:** GitHub Actions (Unit & Security Tests)
-
----
-
-## 🎯 Project Objectives
-
-- Demonstrate proficiency in essential DevOps methodologies and tools.
-- Maintain optimized resource usage (AWS Free Tier).
-- Implement professional-level automation and configuration management.
-- Showcase clearly structured and meticulously documented code, suitable for enterprise-level peer reviews.
+| Layer            | Tooling                         |
+|------------------|----------------------------------|
+| IaC              | Terraform Cloud (remote backend) |
+| Provisioning     | Ansible                         |
+| Containerization | Docker                          |
+| Orchestration    | K3s (lightweight Kubernetes)     |
+| CI/CD            | GitHub Actions + Terraform Cloud |
+| Cloud Provider   | AWS Free Tier (EC2)              |
 
 ---
 
-## 📂 Project Structure
+## ✅ Completed Sprints
 
-```
-Hello-k3s-ansible/
-├── ansible/        # Ansible playbooks and inventory files
-├── terraform/      # Terraform configuration files for AWS infrastructure
-├── flask-app/      # Python Flask application source code
-├── docker/         # Dockerfiles and Docker Compose files
-└── kubernetes/     # Kubernetes YAML manifests for k3s deployment
-```
+### ✅ Sprint 1: Project Initialization
+- ✅ Defined project goals and DevOps stack
+- ✅ Chose lightweight architecture (Flask + K3s)
+- ✅ Established Agile-based Sprint methodology
 
----
+### ✅ Sprint 2: Terraform Cloud Setup
+- ✅ Installed Terraform CLI and connected to Terraform Cloud
+- ✅ Created AWS EC2 instance using `t2.micro`
+- ✅ Configured `main.tf`, `variables.tf`, and `outputs.tf`
+- ✅ Automatically generates Ansible inventory from EC2 IP
 
-## ✅ Project Achievements
+### ✅ Sprint 3: Ansible Provisioning
+- ✅ Installed Docker and K3s on the EC2 instance
+- ✅ WSL (Ubuntu) used to run Ansible locally and test configuration
+- ✅ Automated provisioning and verified Kubernetes installation
+- ✅ Refactored Terraform to inject CI SSH key using `user_data`
 
-### 🏗️ Infrastructure Setup with Terraform
+### ✅ Sprint 4: Docker + Flask Application
+- ✅ Built a minimal Flask app with a basic HTML UI
+- ✅ Used multi-stage Docker build for smallest possible image
+- ✅ Verified local execution and pushed to Docker Hub (`fragmendal/hello-k3s-flask`)
+- ✅ Docker image build/push automated via GitHub Actions
+- ✅ Workflow triggers only on Flask app changes
 
-- Provisioned AWS EC2 instance (`t2.micro`, Ubuntu 22.04) in region `us-east-1`.
-- Configured secure access through SSH and HTTP using Security Groups.
-- Automated SSH key pair creation and attachment via Terraform.
+### ✅ Sprint 5: Kubernetes Deployment
+- ✅ Created Kubernetes manifests (`deployment.yaml`, `service.yaml`)
+- ✅ Applied manifests on K3s cluster via Ansible
+- ✅ Exposed app using NodePort service (`:30001`)
+- ✅ App publicly accessible via EC2 IP + NodePort
 
-### ⚙️ Automated Server Provisioning with Ansible
-
-- Developed an Ansible inventory for managing remote servers.
-- Created robust Ansible playbooks to automate:
-  - Installation of Docker Engine (v28.0.2) and Docker Compose.
-  - Deployment of lightweight Kubernetes distribution (k3s v1.31.6).
-- Ensured all Ansible tasks are clearly documented, repeatable, and idempotent.
-
-### 🐳 Containerization & Dockerization
-
-- Containerized Flask application using an optimized Dockerfile (multi-stage build, Alpine-based).
-- Built and tested ultra-lightweight Docker images.
-- Deployed a modern, clean UI using Flask and Bootstrap for enhanced frontend experience.
-- Docker image available publicly on Docker Hub:
-  - [fragmendal/flask-k3s-app](https://hub.docker.com/r/fragmendal/flask-k3s-app)
-
-### 🚀 Kubernetes Deployment & Automation
-
-- Created Kubernetes Deployment and Service YAML manifests.
-- Automated deployment of Flask application onto Kubernetes (k3s) using Ansible.
-- Verified the Flask application is accessible via Kubernetes NodePort externally.
+### ✅ Sprint 6: CI/CD Automation
+- ✅ GitHub Actions dynamically fetches EC2 IP from Terraform Cloud
+- ✅ SSHs using CI key securely stored in GitHub Secrets
+- ✅ Runs Ansible provisioning end-to-end via CI pipeline
+- ✅ Entire workflow is idempotent, automated, and secure
+- ✅ OIDC authentication replaces static AWS credentials
+- ✅ Workflow runs only after successful Terraform Apply
 
 ---
 
-## 📌 Completed Sprints
+## 🧪 How It Works
 
-| Sprint # | Description                                    | Status          |
-|----------|------------------------------------------------|-----------------|
-| 1        | Project Initialization and AWS Setup           | ✅ Completed    |
-| 2        | Infrastructure as Code with Terraform          | ✅ Completed    |
-| 3        | Automation and Provisioning with Ansible       | ✅ Completed    |
-| 4        | Flask Application Containerization with Docker | ✅ Completed    |
-| 5        | Kubernetes (k3s) Deployment & Automation       | ✅ Completed    |
-
----
-
-## 🚧 To-Do List (Next Sprints)
-
-- [ ] **Sprint 6:** Implement CI/CD pipelines with GitHub Actions, integrating unit and security tests.
-- [ ] **Optimization & Security Review:** Resource optimization, security best practices review, and advanced monitoring.
+1. **Terraform Cloud** provisions the EC2 instance
+2. The instance is configured with two SSH keys:
+   - Your **personal key** for manual access
+   - A **CI key** injected via `user_data` for GitHub Actions
+3. **GitHub Actions** detects new IP from Terraform Cloud using the `paambaati/tfc-output-action` plugin
+4. Ansible connects via SSH to provision Docker, K3s, and deploy the Flask app
+5. The app is available at `http://<ec2_ip>:30001`
 
 ---
 
-## 🛡️ Security & Optimization
+## ⚙️ CI/CD Workflows
 
-- Continuous monitoring and cost management practices to ensure zero-cost AWS usage.
-- Secure handling of AWS credentials (using AWS CLI, no hard-coded keys).
-- Clearly documented SSH key management and automated provisioning for enhanced security.
+### 🔧 Terraform Workflow (Terraform Cloud VCS-connected)
+- Triggers on changes to `.tf` files
+- Applies infrastructure changes automatically
 
----
-
-## 📈 CI/CD Pipeline (Coming Soon)
-
-Automated GitHub Actions pipelines will include:
-
-- Automated Docker image builds and security scans.
-- Automated deployments to Kubernetes (k3s).
-- Integrated testing (unit and security tests) for continuous validation.
+### 🤖 Ansible + K3s Workflow
+**File:** `.github/workflows/ansible.yml`
+- Triggers on changes to `ansible/**` or `kubernetes/**`
+- Fetches EC2 IP dynamically from Terraform Cloud
+- SSHs into EC2 using CI key
+- Provisions Docker, K3s, and deploys the app
 
 ---
 
-## 🎨 Application UI (Flask)
-
-Minimalist Flask application with modern and clean UI powered by Bootstrap 5.
-
----
-
-## 🧑‍💻 Author
-
-**Nassim Khalfa**  
-DevOps Engineer   
-🔗 [Nassim Khalfa](https://www.linkedin.com/in/nassim-khalfa)  
+## 🛡️ Security Best Practices
+- 🧑‍💻 Developer and CI access keys are **separated**
+- 🔐 SSH private keys stored in **GitHub Secrets**
+- ☁️ AWS access via **OIDC GitHub Identity Federation**
+- 🧱 Terraform IAM user has a **minimal IAM policy**
 
 ---
 
-⭐ **If you find this project interesting or valuable, please consider giving it a star!**
+## 🧰 Dev Environment
+- **Windows 11** + **WSL2 Ubuntu**
+- GitHub, Terraform CLI, AWS CLI, Docker Desktop
+- IDE: Visual Studio Code
+
+---
+
+## 📝 To-Do List (Backlog)
+
+| Priority | Task                                                  |
+|----------|-------------------------------------------------------|
+| 🔜 High   | Improve IAM policy for Terraform Cloud (least privilege) |
+| 🔜 High   | Automate Terraform Apply before Ansible CI workflow   |
+| 🧪 Medium | Add basic unit tests & security scans in Flask app    |
+| 🎨 Low    | Add custom domain and SSL (with Route53 + ACM)       |
+| 💡 Bonus  | Auto-destroy old EC2 instance after idle period       |
+
+---
+
+## 👨‍💻 Author
+**Nassim Khalfa** — DevOps Junior Engineer
+> This project was created as part of a DevOps portfolio to showcase skills in infrastructure automation, containerization, and cloud-native workflows.
+
+---
+
+## 📎 License
+MIT License
+

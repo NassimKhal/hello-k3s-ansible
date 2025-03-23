@@ -2,7 +2,8 @@ name: Ansible Provisioning
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'ansible/**'
       - 'kubernetes/**'
@@ -12,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install SSH key
+      - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Fetch EC2 IP from Terraform Cloud Output
+      - name: Fetch EC2 Public IP from Terraform Cloud
         uses: paambaati/tfc-output-action@v1.0.8
         id: tfc-output
         with:
@@ -31,7 +32,7 @@ jobs:
       - name: Exit if EC2 IP is not available
         if: ${{ steps.tfc-output.outputs.value == '' }}
         run: |
-          echo "No EC2 instance available. Exiting..."
+          echo "No EC2 instance found. Exiting workflow."
           exit 0
 
       - name: Create dynamic Ansible inventory
@@ -40,33 +41,57 @@ jobs:
           echo "[flask_server]" > ansible/inventory.ini
           echo "${{ steps.tfc-output.outputs.value }} ansible_user=ubuntu" >> ansible/inventory.ini
 
-      - name: Detect changed files and set Ansible tags
-        id: changes
+      - name: Check if instance is already provisioned
+        id: check_provisioned
         run: |
-          git fetch origin main
-          CHANGED=$(git diff --name-only origin/main...HEAD)
-
-          TAGS=""
-          if echo "$CHANGED" | grep -q "^ansible/"; then
-            TAGS="install"
+          if ssh -o StrictHostKeyChecking=no ubuntu@${{ steps.tfc-output.outputs.value }} test -f /etc/provisioned_by_ansible; then
+            echo "Instance is already provisioned."
+            echo "provisioned=true" >> $GITHUB_OUTPUT
+          else
+            echo "Instance is NOT provisioned."
+            echo "provisioned=false" >> $GITHUB_OUTPUT
           fi
-          if echo "$CHANGED" | grep -q "^kubernetes/"; then
-            if [[ "$TAGS" == "install" ]]; then
-              TAGS="install,deploy"
-            else
-              TAGS="deploy"
+
+      - name: Detect changed files and set Ansible tags
+        id: tags
+        run: |
+          if [ "${{ steps.check_provisioned.outputs.provisioned }}" = "false" ]; then
+            echo "tags=install,deploy" >> $GITHUB_OUTPUT
+          else
+            git fetch origin main
+            CHANGED=$(git diff --name-only origin/main...HEAD)
+
+            TAGS=""
+            if echo "$CHANGED" | grep -q "^ansible/"; then
+              TAGS="install"
             fi
+            if echo "$CHANGED" | grep -q "^kubernetes/"; then
+              if [[ "$TAGS" == "install" ]]; then
+                TAGS="install,deploy"
+              else
+                TAGS="deploy"
+              fi
+            fi
+            echo "tags=$TAGS" >> $GITHUB_OUTPUT
           fi
 
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
-          echo "Detected tags: $TAGS"
+      - name: Wait for SSH to be Ready
+        run: |
+          echo "Waiting for SSH on ${{ steps.tfc-output.outputs.value }}..."
+          for i in {1..20}; do
+            if ssh -o StrictHostKeyChecking=no ubuntu@${{ steps.tfc-output.outputs.value }} 'echo SSH is up'; then
+              echo "SSH is ready!"
+              break
+            fi
+            sleep 10
+          done
 
       - name: Run Ansible Playbook with detected tags
-        if: ${{ steps.changes.outputs.tags != '' }}
+        if: ${{ steps.tags.outputs.tags != '' }}
         working-directory: ansible
         run: |
-          ansible-playbook -i inventory.ini playbook.yml --tags "${{ steps.changes.outputs.tags }}"
+          ansible-playbook -i inventory.ini playbook.yml --tags "${{ steps.tags.outputs.tags }}"
 
-      - name: Skip playbook (no relevant changes)
-        if: ${{ steps.changes.outputs.tags == '' }}
+      - name: Skip playbook (no relevant tags)
+        if: ${{ steps.tags.outputs.tags == '' }}
         run: echo "No Ansible-related changes detected. Skipping playbook run."

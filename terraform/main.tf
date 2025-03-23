@@ -52,7 +52,14 @@ resource "aws_instance" "flask_instance" {
   ami                    = "ami-0f9de6e2d2f067fca" # Amazon Ubuntu 22.04 AMI (us-east-1)
   instance_type          = var.instance_type
   vpc_security_group_ids     = [aws_security_group.flask_sg.id]
-  key_name               = aws_key_pair.hello_k3s_ansible_key.key_name  
+  key_name               = aws_key_pair.hello_k3s_ansible_key.key_name
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "${var.ssh_ci_pub_key}" >> /home/ubuntu/.ssh/authorized_keys
+              chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
+              chmod 600 /home/ubuntu/.ssh/authorized_keys
+              EOF
+  
 
 
   tags = {

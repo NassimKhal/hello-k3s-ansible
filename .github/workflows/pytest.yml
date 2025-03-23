@@ -1,0 +1,33 @@
+name: Flask App Tests
+
+on:
+  push:
+    paths:
+      - 'flask-app/**'
+  pull_request:
+    paths:
+      - 'flask-app/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: flask-app
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Unit Tests
+        working-directory: flask-app
+        run: |
+          pytest

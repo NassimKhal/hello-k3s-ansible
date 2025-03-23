@@ -1,0 +1,22 @@
+name: Terraform Security Scan
+
+on:
+  push:
+    paths:
+      - 'terraform/**'
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: |
+          pip install checkov
+
+      - name: Run Checkov on Terraform Files
+        run: |
+          checkov -d terraform

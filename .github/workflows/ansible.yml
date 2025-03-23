@@ -26,40 +26,23 @@ jobs:
           role-to-assume: arn:aws:iam::539247494423:role/GitHubActionsOIDCRole
           aws-region: us-east-1
 
-      - name: Fetch EC2 Public IP from Terraform Cloud
-        id: tf_output
-        env:
-          TFC_ORG: hello-k3s
-          TFC_WORKSPACE: hello-k3s-ansible
-          TFC_TOKEN: ${{ secrets.TF_API_TOKEN }}
-        run: |
-          echo "Getting workspace ID..."
-          workspace_id=$(curl -s \
-            --header "Authorization: Bearer $TFC_TOKEN" \
-            https://app.terraform.io/api/v2/organizations/$TFC_ORG/workspaces/$TFC_WORKSPACE \
-            | jq -r .data.id)
+      steps:
+      - name: Fetch remote value from Terraform
+        uses: paambaati/tfc-output-action@v1.0.8
+        id: tfc-output
+        with:
+          apiToken: ${{ secrets.TF_API_TOKEN }}
+          workspaceId: ws-kcEEUwPhAyDuzShM
+          variableName: 'ec2_public_ip'
 
-          echo "Getting current state version..."
-          state_url="https://app.terraform.io/api/v2/workspaces/$workspace_id/current-state-version"
-          output_url=$(curl -s \
-            --header "Authorization: Bearer $TFC_TOKEN" \
-            $state_url | jq -r .data.relationships.outputs.links.related)
-
-          echo "Fetching outputs..."
-          ec2_ip=$(curl -s \
-            --header "Authorization: Bearer $TFC_TOKEN" \
-            $output_url | jq -r '.data[] 
-              | select(.attributes.name=="ec2_public_ip") 
-              | .attributes.value')
-
-          echo "Public IP found: $ec2_ip"
-          echo "ec2_ip=$ec2_ip" >> $GITHUB_OUTPUT
+      - name: Print the value
+        run: echo "IP is ${{ steps.tfc-output.outputs.value }}"
 
       - name: Create dynamic inventory.ini
         run: |
           mkdir -p ansible
           echo "[flask_server]" > ansible/inventory.ini
-          echo "${{ steps.tf_output.outputs.ec2_ip }}" >> ansible/inventory.ini
+          echo "${{ steps.tf_output.outputs.ec2_public_ip }}" >> ansible/inventory.ini
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0

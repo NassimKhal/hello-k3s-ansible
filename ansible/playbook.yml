@@ -41,13 +41,6 @@
       shell: |
         until k3s kubectl get nodes; do sleep 5; done
 
-    - name: Mark instance as provisioned
-      tags: install
-      when: not provisioned_status.stat.exists
-      file:
-        path: /etc/provisioned_by_ansible
-        state: touch
-
     - name: Copy Kubernetes manifests to the remote server
       tags: deploy
       copy:
@@ -62,6 +55,14 @@
     - name: Apply Kubernetes Service
       tags: deploy
       shell: sudo k3s kubectl apply -f /tmp/flask-service.yaml
+
+    - name: Mark instance as provisioned
+      tags: always
+      when: not provisioned_status.stat.exists
+      file:
+        path: /etc/provisioned_by_ansible
+        state: touch
+
 
     - name: Clean up manifest files
       tags: deploy

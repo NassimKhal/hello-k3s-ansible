@@ -16,3 +16,7 @@ variable "ssh_public_key" {
   description = "Public SSH key for EC2 instance"
   type        = string
 }
+variable "ssh_ci_pub_key" {
+  description = "CI/CD public SSH key used by GitHub Actions to connect"
+  type        = string
+}

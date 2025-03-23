@@ -1,0 +1,15 @@
+# Ignore everything
+*
+
+# Except Terraform files
+!*.tf
+!*.tfvars
+!*.backend
+!.terraform.tfstate
+!.terraform.tfstate.backup
+
+# Allow Terraform config directories
+!.terraform/**
+
+# Keep .terraform.lock.hcl (required for consistent provider versions)
+!.terraform.lock.hcl

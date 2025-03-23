@@ -1,0 +1,9 @@
+# Ignore everything
+*
+
+# Allow only Terraform directory
+!terraform/
+!terraform/**
+
+# Allow .terraform.lock.hcl in Terraform dir
+!terraform/.terraform.lock.hcl

@@ -57,11 +57,11 @@
 
     - name: Apply Kubernetes Deployment
       tags: deploy
-      shell: k3s kubectl apply -f /tmp/flask-deployment.yaml
+      shell: sudo k3s kubectl apply -f /tmp/flask-deployment.yaml
 
     - name: Apply Kubernetes Service
       tags: deploy
-      shell: k3s kubectl apply -f /tmp/flask-service.yaml
+      shell: sudo k3s kubectl apply -f /tmp/flask-service.yaml
 
     - name: Clean up manifest files
       tags: deploy

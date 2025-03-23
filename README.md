@@ -105,13 +105,13 @@ This project follows **industry-standard best practices**, including secure CI/C
 
 ## 📝 To-Do List (Backlog)
 
-| Priority | Task                                                  |
-|----------|-------------------------------------------------------|
-| 🔜 High   | Improve IAM policy for Terraform Cloud (least privilege) |
-| 🔜 High   | Automate Terraform Apply before Ansible CI workflow   |
-| 🧪 Medium | Add basic unit tests & security scans in Flask app    |
-| 🎨 Low    | Add custom domain and SSL (with Route53 + ACM)       |
-| 💡 Bonus  | Auto-destroy old EC2 instance after idle period       |
+| Sprint     | Task                                                                                      | Priority |
+|------------|---------------------------------------------------------------------------------------------|----------|
+| Sprint 7   | Optimize Terraform Cloud triggers to run only on `.tf` file changes                       | 🔥 High  |
+| Sprint 8   | Link Ansible workflow with Terraform Cloud and wait for EC2 instance to be available      | 🔥 High  |
+| Sprint 9   | Add unit tests (`pytest`) and IaC security scanning (`Checkov`)                            | ✅ Medium |
+| Sprint 10  | Add monitoring using Prometheus + Grafana on EC2 and container                             | ✅ Medium |
+| Sprint 11  | Store secrets and SSH keys more securely (explore `git-crypt`, `sops`, or HashiCorp Vault) | ✅ Medium |
 
 ---
 

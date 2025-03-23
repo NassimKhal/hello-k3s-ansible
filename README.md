@@ -59,6 +59,11 @@ This project follows **industry-standard best practices**, including secure CI/C
 - ✅ OIDC authentication replaces static AWS credentials
 - ✅ Workflow runs only after successful Terraform Apply
 
+### ✅ Sprint 7: Terraform Cloud Trigger Optimization
+- ✅ Implemented `.tfcignore` inside `terraform/` folder
+- ✅ Ensured Terraform Cloud only triggers on `.tf` or infrastructure file changes
+- ✅ Non-infra changes (README, app, etc.) no longer trigger runs
+
 ---
 
 ## 🧪 How It Works
@@ -107,8 +112,9 @@ This project follows **industry-standard best practices**, including secure CI/C
 
 | Sprint     | Task                                                                                      | Priority |
 |------------|---------------------------------------------------------------------------------------------|----------|
-| Sprint 7   | Optimize Terraform Cloud triggers to run only on `.tf` file changes                       | 🔥 High  |
-| Sprint 8   | Link Ansible workflow with Terraform Cloud and wait for EC2 instance to be available      | 🔥 High  |
+| Sprint 8   | Link Ansible workflow to Terraform Cloud using **Webhook + `repository_dispatch`**       | 🔥 High  |
+|            | ➤ Trigger Ansible provisioning only after EC2 is created via Terraform Cloud              |          |
+|            | ➤ Configure Terraform Cloud Webhook + GitHub PAT                                           |          |
 | Sprint 9   | Add unit tests (`pytest`) and IaC security scanning (`Checkov`)                            | ✅ Medium |
 | Sprint 10  | Add monitoring using Prometheus + Grafana on EC2 and container                             | ✅ Medium |
 | Sprint 11  | Store secrets and SSH keys more securely (explore `git-crypt`, `sops`, or HashiCorp Vault) | ✅ Medium |

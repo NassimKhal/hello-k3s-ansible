@@ -1,4 +1,4 @@
-name: Ansible Provisioning and Kubernetes Deployment
+name: Ansible Provisioning
 
 on:
   push:
@@ -8,25 +8,16 @@ on:
       - 'ansible/**'
       - 'kubernetes/**'
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  deploy:
+  ansible-run:
+    name: Run Ansible Playbook
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::539247494423:role/GitHubActionsOIDCRole
-          aws-region: us-east-1
-
-      - name: Fetch EC2 public IP from Terraform Cloud
+      - name: Fetch EC2 Public IP from Terraform Cloud
         id: tfc-output
         uses: paambaati/tfc-output-action@v1.0.8
         with:
@@ -34,21 +25,30 @@ jobs:
           workspaceId: ws-kcEEUwPhAyDuzShM
           variableName: 'ec2_public_ip'
 
+      - name: Check if EC2 IP is available
+        id: check-ip
+        run: |
+          ip="${{ steps.tfc-output.outputs.value }}"
+          echo "EC2 IP: $ip"
+          if [ -z "$ip" ]; then
+            echo "No EC2 instance detected. Exiting."
+            exit 0
+          fi
+          echo "ip=$ip" >> $GITHUB_ENV
+
       - name: Create dynamic Ansible inventory
         run: |
           mkdir -p ansible
           echo "[flask_server]" > ansible/inventory.ini
-          echo "${{ steps.tfc-output.outputs.value }} ansible_user=ubuntu" >> ansible/inventory.ini
+          echo "$ip ansible_user=ubuntu" >> ansible/inventory.ini
 
-
-      - name: Setup SSH Agent
+      - name: Set up SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY_CI }}
 
-      - name: Wait for SSH to be ready
+      - name: Wait for SSH to be Ready
         run: |
-          ip="${{ steps.tfc-output.outputs.value }}"
           echo "Waiting for SSH on $ip..."
           for i in {1..20}; do
             if ssh -o StrictHostKeyChecking=no ubuntu@$ip 'echo SSH is up'; then
@@ -60,4 +60,5 @@ jobs:
 
       - name: Run Ansible Playbook
         working-directory: ansible
-        run: ansible-playbook -i inventory.ini playbook.yml
+        run: |
+          ansible-playbook -i inventory.ini playbook.yml

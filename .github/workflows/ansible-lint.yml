@@ -1,0 +1,30 @@
+name: Ansible Lint Check
+
+on:
+  push:
+    paths:
+      - 'ansible/**'
+  pull_request:
+    paths:
+      - 'ansible/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible and Ansible Lint
+        run: |
+          pip install ansible ansible-lint
+
+      - name: Run Ansible Lint
+        run: |
+          ansible-lint ansible/playbook.yml

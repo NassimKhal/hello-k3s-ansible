@@ -27,34 +27,39 @@ jobs:
           aws-region: us-east-1
 
       - name: Fetch EC2 Public IP from Terraform Cloud
+        id: tf_output
         env:
           TFC_ORG: hello-k3s
           TFC_WORKSPACE: hello-k3s-ansible
           TFC_TOKEN: ${{ secrets.TF_API_TOKEN }}
         run: |
-          run_id=$(curl -s \
+          echo "Getting workspace ID..."
+          workspace_id=$(curl -s \
             --header "Authorization: Bearer $TFC_TOKEN" \
-            https://app.terraform.io/api/v2/organizations/$TFC_ORG/workspaces/$TFC_WORKSPACE/current-run | jq -r .data.id)
+            https://app.terraform.io/api/v2/organizations/$TFC_ORG/workspaces/$TFC_WORKSPACE \
+            | jq -r .data.id)
 
-          output_url="https://app.terraform.io/api/v2/runs/$run_id/plan/output"
+          echo "Getting current state version..."
+          state_url="https://app.terraform.io/api/v2/workspaces/$workspace_id/current-state-version"
+          output_url=$(curl -s \
+            --header "Authorization: Bearer $TFC_TOKEN" \
+            $state_url | jq -r .data.relationships.outputs.links.related)
 
-          echo "Waiting for Terraform output..."
-          sleep 10
-
+          echo "Fetching outputs..."
           ec2_ip=$(curl -s \
             --header "Authorization: Bearer $TFC_TOKEN" \
-            $output_url | jq -r '.data.attributes.resource_changes[]? 
-              | select(.type=="aws_instance") 
-              | .change.after.public_ip')
+            $output_url | jq -r '.data[] 
+              | select(.attributes.name=="ec2_public_ip") 
+              | .attributes.value')
 
-          echo "Fetched EC2 IP: $ec2_ip"
-          echo "::set-output name=ec2_ip::$ec2_ip"
+          echo "Public IP found: $ec2_ip"
+          echo "ec2_ip=$ec2_ip" >> $GITHUB_OUTPUT
 
       - name: Create dynamic inventory.ini
         run: |
           mkdir -p ansible
           echo "[flask_server]" > ansible/inventory.ini
-          echo "${{ steps.deploy.outputs.ec2_ip }}" >> ansible/inventory.ini
+          echo "${{ steps.tf_output.outputs.ec2_ip }}" >> ansible/inventory.ini
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -63,7 +68,7 @@ jobs:
 
       - name: Wait for SSH to be Ready
         run: |
-          ip="${{ steps.deploy.outputs.ec2_ip }}"
+          ip="${{ steps.tf_output.outputs.ec2_ip }}"
           echo "Waiting for SSH on $ip..."
           for i in {1..20}; do
             if ssh -o StrictHostKeyChecking=no ec2-user@$ip 'echo SSH is up'; then
